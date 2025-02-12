@@ -1,13 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import MercadoPagoButton from '../../components/MercadoPagoButton';
+import MercadoPagoButton from '../../../components/MercadoPagoButton';
 import PaymentMethod from '../../components/payment/PaymentMethod.astro';
 ---
 
 <Layout title="Checkout">
   <main class="container mx-auto px-4 py-8">
     <div class="max-w-2xl mx-auto">
-      <h1 class="text-3xl font-bold mb-6">Finalizar Compra</h1>
+      <h1 class="mt-12 text-3xl font-bold mb-6">Finalizar Compra</h1>
       
       <div class="bg-kaya-dark/50 p-6 brutalist-border mb-6">
         <h2 class="text-xl font-mono mb-4">Resumen de la compra</h2>
@@ -113,7 +113,7 @@ import PaymentMethod from '../../components/payment/PaymentMethod.astro';
       return `
         <div class="flex items-center justify-between p-4 bg-kaya-dark/30 brutalist-border hover:bg-kaya-dark/40 transition-colors" data-product-id="${item.id}">
           <div class="flex-1">
-            <h3 class="font-mono text-lg">${item.name}</h3>
+            <h3 class="text-lg">${item.name}</h3>
             <div class="flex items-center gap-4 mt-2">
               <div class="flex items-center gap-2 brutalist-border p-1">
                 <button 

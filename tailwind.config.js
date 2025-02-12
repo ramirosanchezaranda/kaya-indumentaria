@@ -14,6 +14,7 @@ module.exports = {
           accent: 'rgb(165, 3, 3)',
           'accent-rgb': '165, 3, 3',
         },
+        'kaya-accent': 'rgb(165, 3, 3)',
       },
       backgroundImage: {
         'hero-pattern': 'url("/kaya-ind-bckg2.webm")',

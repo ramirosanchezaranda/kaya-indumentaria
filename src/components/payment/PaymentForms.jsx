@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import Cards from 'react-payment-inputs'
+import { PaymentInputsWrapper, usePaymentInputs } from 'react-payment-inputs'
+import images from 'react-payment-inputs/images'
 
 const PaymentForms = () => {
-
     const [state, setState] = useState({
         number: "",
         name: "",
@@ -11,114 +11,91 @@ const PaymentForms = () => {
         focus: ""
     })
 
+    const { 
+        wrapperProps, 
+        getCardImageProps, 
+        getCardNumberProps, 
+        getExpiryDateProps, 
+        getCVCProps 
+    } = usePaymentInputs()
+
     const handleInputChange = (e) => {
         setState({
             ...state,
-            [e.target.name] : e.target.value
-        })
-    }
-
-    const handleFocusChange = (e) => {
-        setState({
-            ...state,
-            focus : e.target.name
+            [e.target.name]: e.target.value
         })
     }
 
     const processPayment = () => {
-        console.log("number => ", state.number)
-        console.log("name => ", state.name)
-        console.log("expiry => ", state.expiry)
-        console.log("cvc => ", state.cvc)
-        console.log(JSON.stringify(state))
+        console.log("Payment details:", state)
     }
 
     return (
-        <div className="card ">
-            <div className="card-body">
-
-                <Cards
-                    number={state.number}
-                    name={state.name}
-                    expiry={state.expiry}
-                    cvc={state.cvc}
-                    focused={state.focus}
-                />
-                <form>
-                    <div className="form-group">
-                        <label htmlFor="number">Número de la tarjeta</label>
-                        <input
-                            type="text"
+        <div className="card bg-black brutalist-border shadow-md p-6">
+            <div className="card-body space-y-4 w-full">
+                <PaymentInputsWrapper 
+                    {...wrapperProps} 
+                    className="space-y-4 "
+                >
+                    <div className="flex space-y-4">
+                        <input 
+                            {...getCardNumberProps()}
                             name="number"
-                            id="number"
-                            maxLength="16"
-                            className="form-control"
+                            value={state.number}
                             onChange={handleInputChange}
-                            onFocus={handleFocusChange}
+                            placeholder="Card Number"
+                            className="w-full border border-gray-300 text-black focus:outline-none focus:ring-2 focus:ring-kaya-accent"
                         />
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="name">Nombre</label>
-                        <input
-                            type="text"
-                            name="name"
-                            id="name"
-                            maxLength="30"
-                            className="form-control"
+                    <div className="flex space-x-4 pl-4">
+                        <input 
+                            {...getExpiryDateProps()}
+                            name="expiry"
+                            value={state.expiry}
                             onChange={handleInputChange}
-                            onFocus={handleFocusChange}
+                            placeholder="MM/YY"
+                            className="w-1/2 px-4 py-2 border border-gray-300 text-black focus:outline-none focus:ring-2 focus:ring-kaya-accent"
+                        />
+                        <input 
+                            {...getCVCProps()}
+                            name="cvc"
+                            value={state.cvc}
+                            onChange={handleInputChange}
+                            placeholder="CVC"
+                            className="w-1/2 px-4 py-2 border border-gray-300 text-black focus:outline-none focus:ring-2 focus:ring-kaya-accent"
                         />
                     </div>
-                    <div className="form-row">
-                        <div className="form-group col-md-6">
-                            <label htmlFor="expiry">Fecha de expiración</label>
-                            <input
-                                type="text"
-                                name="expiry"
-                                id="expiry"
-                                maxLength="4"
-                                className="form-control"
-                                onChange={handleInputChange}
-                                onFocus={handleFocusChange}
-                            />
-                        </div>
-                        <div className="form-group col-md-6">
-                            <label htmlFor="cvc">CVC</label>
-                            <input
-                                type="text"
-                                name="cvc"
-                                id="cvc"
-                                maxLength="4"
-                                className="form-control"
-                                onChange={handleInputChange}
-                                onFocus={handleFocusChange}
-                            />
-                        </div>
-                    </div>
+                </PaymentInputsWrapper>
 
-                    <button onClick={processPayment} type="button" className="btn btn-success btn-block btn-lg">Pagar</button>
-                </form>
+                <div className="form-group">
+                    <label 
+                        htmlFor="name" 
+                        className="block text-sm font-medium text-gray-500 mb-2"
+                    >
+                        Nombre del Titular
+                    </label>
+                    <input
+                        type="text"
+                        name="name"
+                        id="name"
+                        maxLength="30"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-kaya-accent"
+                        value={state.name}
+                        onChange={handleInputChange}
+                        placeholder="Nombre como aparece en la tarjeta"
+                    />
+                </div>
+
+                <button 
+                    onClick={processPayment} 
+                    type="button" 
+                    className="w-full bg-kaya-accent text-white py-3 brutalist-border hover:bg-red-700 transition-colors duration-300"
+                >
+                    Pagar
+                </button>
             </div>
         </div>
     )
 }
 
 export default PaymentForms
-export const handleInputChange = (e) => {
-    setState({
-    ...state,
-    [e.target.name] : e.target.value
-})}
-export const handleFocusChange = (e) => {
-    setState({
-        ...state,
-        focus : e.target.name
-    })
-}
-export const processPayment = (e) => {
-    console.log("number => ", state.number)
-    console.log("name => ", state.name)
-    console.log("expiry => ", state.expiry)
-    console.log("cvc => ", state.cvc)
-    console.log(JSON.stringify(state))
-}

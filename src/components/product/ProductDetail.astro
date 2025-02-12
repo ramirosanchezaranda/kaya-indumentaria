@@ -111,6 +111,7 @@ const { id, name, price, image, description, sizes } = Astro.props;
       
       <button 
         id="add-to-cart"
+        onclick={`addToCart({id: ${id}, name: '${name}', price: ${price}})`}
         class="brutalist-border w-full py-3 mt-8 hover:text-kaya-accent transition-colors text-center text-lg"
       >
         COMPRAR AHORA
@@ -250,24 +251,32 @@ const { id, name, price, image, description, sizes } = Astro.props;
   }
 
   // Manejar selección de talla
-  document.querySelectorAll('.size-button').forEach(button => {
-    button.addEventListener('click', (e) => {
-      // Remover selección previa
-      document.querySelectorAll('.size-button').forEach(btn => 
-        btn.classList.remove('bg-kaya-accent', 'text-white'));
-      
-      // Agregar selección nueva
-      button.classList.add('bg-kaya-accent', 'text-white');
-      selectedSize = button.dataset.size;
+let selectedSize = null;
 
-      // Mostrar talla seleccionada
-      const sizeDisplay = document.getElementById('selected-size-display');
-      if (sizeDisplay) {
-        sizeDisplay.querySelector('span').textContent = selectedSize;
+document.querySelectorAll('.size-button').forEach(button => {
+  button.addEventListener('click', (e) => {
+    // Remover selección previa
+    document.querySelectorAll('.size-button').forEach(btn => {
+      btn.classList.remove('bg-kaya-accent', 'text-white');
+      btn.classList.add('border-gray-300', 'text-gray-700');
+    });
+    
+    // Agregar selección nueva
+    e.currentTarget.classList.remove('border-gray-300', 'text-gray-700');
+    e.currentTarget.classList.add('bg-kaya-accent', 'text-white');
+    selectedSize = e.currentTarget.dataset.size;
+
+    // Mostrar talla seleccionada
+    const sizeDisplay = document.getElementById('selected-size-display');
+    if (sizeDisplay) {
+      const sizeSpan = sizeDisplay.querySelector('span');
+      if (sizeSpan) {
+        sizeSpan.textContent = selectedSize;
         sizeDisplay.classList.remove('hidden');
       }
-    });
+    }
   });
+});
 
   // Función para calcular el costo de envío
   function calculateShipping(postalCode) {

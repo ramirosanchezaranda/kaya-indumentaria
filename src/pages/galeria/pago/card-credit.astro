@@ -1,0 +1,37 @@
+---
+import React, { useState } from 'react'
+import { Cards } from 'react-payment-inputs'
+import Layout from '../../../layouts/Layout.astro';
+import PaymentForms from '../../../components/payment/PaymentForms.jsx';
+import PaymentInfo from '../../../components/payment/PaymentInfo.jsx';
+import { handleFocusChange, handleInputChange, processPayment} from "../PaymentForms";
+---
+
+<Layout title="Formulario de Pago">
+  <main class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-3xl font-bold mb-6 mt-20">Formulario de Pago</h1>
+      
+      <div class="bg-kaya-dark/50 p-6 brutalist-border">
+        <h2 class="text-xl mb-4">Pago con Tarjeta de Crédito/Débito</h2>
+        
+        <div class="payment-form-container">
+          <PaymentForms client:visible />
+        </div>
+      </div>
+
+      <div class="mt-6 bg-kaya-dark/50 p-4 brutalist-border text-center">
+        <p class="text-sm">
+          Tus datos de pago están protegidos con encriptación de extremo a extremo.
+        </p>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .payment-form-container {
+    @apply p-4 rounded-lg;
+    background-color: rgba(var(--kaya-accent-rgb), 0.3);
+  }
+</style>

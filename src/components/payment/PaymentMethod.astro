@@ -1,5 +1,6 @@
 ---
-import MercadoPagoButton from './MercadoPagoButton.jsx';
+import MercadoPagoButton from '../payment/MercadoPagoButton.jsx';
+import PaymentInfo from './PaymentInfo.jsx';
 
 const paymentMethods = [
   { id: 'card', name: 'Tarjeta de Crédito/Débito', icon: '💳' },
@@ -23,14 +24,30 @@ const paymentMethods = [
         />
         </div>
       ) : (
-        <button
-          class="w-full brutalist-border p-4 flex items-center space-x-4 hover:text-kaya-accent"
-          onclick={`window.location.href='src/components/payment/PaymentMethod.astro?method=${method.id}'`}
+        <a 
+          href={method.id === 'card' 
+            ? `/galeria/pago/card-credit?method=${method.id}` 
+            : method.id === 'transfer' 
+              ? `/galeria/pago/informacion-pago?method=${method.id}` 
+              : `/galeria/pago/metodo-pago?method=${method.id}`
+          }
+          class="w-full brutalist-border p-4 flex items-center space-x-4 hover:text-kaya-accent block text-inherit no-underline"
         >
           <span class="text-2xl">{method.icon}</span>
           <span class="font-mono">{method.name}</span>
-        </button>
+        </a>
       )
     ))}
   </div>
 </div>
+
+<script>
+  // Optional: If you want to handle method selection via JavaScript
+  document.querySelectorAll('.payment-method').forEach(method => {
+    method.addEventListener('click', (e) => {
+      const methodId = e.currentTarget.dataset.method;
+      // You can add additional logic here if needed
+      window.location.href = `/galeria/pago/informacion-pago?method=${methodId}`;
+    });
+  });
+</script>

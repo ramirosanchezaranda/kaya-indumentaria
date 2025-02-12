@@ -112,9 +112,16 @@
       }
       
       // Aquí puedes agregar la lógica para procesar la compra
-      window.location.href = '/checkout';
+      const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+
+      if (cartItems.length > 0) {
+        window.location.href = '/carrito/checkout';
+      } else {
+        alert('Tu carrito está vacío. Agrega productos antes de continuar.');
+      }
     });
   }
+  
   
   // Exponer funciones globalmente
   window.addToCart = addToCart;
