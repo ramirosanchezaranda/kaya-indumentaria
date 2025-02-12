@@ -1,0 +1,125 @@
+---
+---
+
+<div class="relative" id="cart-container">
+  <button
+    id="cart-button"
+    class="brutalist-border p-2 flex items-center gap-2 hover:text-kaya-accent transition-colors"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+    <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">0</span>
+  </button>
+  
+  <div id="cart-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-kaya-dark brutalist-border p-4">
+    <div id="cart-items" class="space-y-2 max-h-96 overflow-y-auto">
+      <!-- Los items del carrito se insertarán aquí -->
+    </div>
+    <div class="mt-4 pt-4 border-t border-gray-600">
+      <div class="flex justify-between font-bold">
+        <span>Total:</span>
+        <span id="cart-total">$0</span>
+      </div>
+      <button
+        id="checkout-button"
+        class="brutalist-border w-full py-2 mt-4 hover:text-kaya-accent transition-colors text-center"
+      >
+        Finalizar Compra
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Type declarations for window object
+  declare global {
+    interface Window {
+      addToCart: (product: any) => void;
+      removeFromCart: (product: any) => void;
+    }
+  }
+
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  
+  function updateCartUI() {
+    const cartCount = document.getElementById('cart-count');
+    const cartItems = document.getElementById('cart-items');
+    const cartTotal = document.getElementById('cart-total');
+    
+    if (cartCount) cartCount.textContent = cart.length.toString();
+    
+    if (cartItems) {
+      cartItems.innerHTML = cart.map(item => `
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="font-bold">${item.name}</p>
+            <p class="text-sm">$${item.price}</p>
+          </div>
+          <button
+            onclick="removeFromCart(${item.id})"
+            class="text-red-500 hover:text-red-700"
+          >
+            X
+          </button>
+        </div>
+      `).join('');
+    }
+    
+    if (cartTotal) {
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+      cartTotal.textContent = `$${total}`;
+    }
+    
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }
+  
+  function addToCart(product) {
+    cart.push(product);
+    updateCartUI();
+  }
+  
+  function removeFromCart(productId) {
+    cart = cart.filter(item => item.id !== productId);
+    updateCartUI();
+  }
+  
+  // Toggle del dropdown del carrito
+  const cartButton = document.getElementById('cart-button');
+  const cartDropdown = document.getElementById('cart-dropdown');
+  
+  if (cartButton && cartDropdown) {
+    cartButton.addEventListener('click', () => {
+      cartDropdown.classList.toggle('hidden');
+    });
+  }
+  
+  // Cerrar el dropdown cuando se hace click fuera
+  document.addEventListener('click', (event) => {
+    const container = document.getElementById('cart-container');
+    if (container && !container.contains(event.target as Node)) {
+      cartDropdown.classList.add('hidden');
+    }
+  });
+  
+  // Botón de checkout
+  const checkoutButton = document.getElementById('checkout-button');
+  if (checkoutButton) {
+    checkoutButton.addEventListener('click', () => {
+      if (cart.length === 0) {
+        alert('El carrito está vacío');
+        return;
+      }
+      
+      // Aquí puedes agregar la lógica para procesar la compra
+      window.location.href = '/checkout';
+    });
+  }
+  
+  // Exponer funciones globalmente
+  window.addToCart = addToCart;
+  window.removeFromCart = removeFromCart;
+  
+  // Actualizar UI inicial
+  updateCartUI();
+</script>

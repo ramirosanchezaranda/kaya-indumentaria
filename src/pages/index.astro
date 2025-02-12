@@ -1,0 +1,69 @@
+---
+import '../styles/global.css';
+import Footer from '../components/footer/Footer.astro';
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/product/ProductCard.astro';
+import { products } from '../data/products';
+
+const featuredProducts = products;
+---
+
+<Layout title="Inicio">
+  <section class="y2k-hero">
+    <video 
+      class="video-background"
+      autoplay 
+      loop 
+      muted 
+      playsinline
+    >
+      <source src="/kaya-ind-bckg2.webm" type="video/webm" />
+    </video>
+
+    <div class="hero-image-container relative z-10 glass-section">
+      <img 
+        src="/products/hero-Photoroom.png" 
+        alt="Imagen de fondo"
+        class="hero-main-image"
+      >
+    </div>
+
+    <div class="hero-content relative z-10 text-white">
+      <h1 class="hero-title text-5xl font-bold mb-4">Kaya Indumentaria</h1>
+      <p class="hero-subtitle text-2xl mb-8">Vanguardia en estilo</p>
+      <div class="hero-buttons">
+        <a href="/contacto" class="hero-button brutalist-border px-8 py-4 text-xl inline-block mt-8 mr-4">Contacto</a>
+        <a href="/galeria" class="hero-button brutalist-border px-8 py-4 text-xl inline-block mt-8">Galería</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de productos destacados -->
+  <section class="featured-products relative z-10">
+    <div class="section-spacing">
+      <div class="glass-section">
+        <h2 class="text-4xl font-bold mb-12 brutalist-border inline-block px-4 py-2" data-aos="fade-right">
+          DESTACADOS
+        </h2>
+        <div class="product-grid">
+          {featuredProducts.map((product, index) => (
+            <div class="product-card-wrapper" data-aos="fade-up" data-aos-delay={index * 100}>
+              <ProductCard {...product} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección con enlace a la galería -->
+  <div class="container mx-auto px-4 text-center pb-20 relative z-10" data-aos="fade-up">
+    <div>
+      <a href="/galeria" class="brutalist-border px-8 py-4 text-xl inline-block">
+        EXPLORAR COLECCIÓN
+      </a>
+    </div>
+  </div>
+
+  <Footer />
+</Layout>

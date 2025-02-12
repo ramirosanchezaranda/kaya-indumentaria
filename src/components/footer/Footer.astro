@@ -1,0 +1,81 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ThreeBackground from "../animations/ThreeBackground.astro";
+const currentYear = new Date().getFullYear();
+---
+
+      <div data-aos="fade-up" data-aos-delay="100" class="text-center backdrop-blur-sm">
+        <ThreeBackground />
+        <div class="text-xl font-bold mb-4 mt-8">Contáctanos</div>
+        <form class="p-4 w-full max-w-md mx-auto" action="https://formsubmit.co/327021ed980c060bab386d35e46a3092 " method="POST">
+          <label for="email">Email</label><br>
+          <input class="form-input px-4 py-2 brutalist-border w-full" type="email" id="email" name="email" required><br><br>
+
+          <label for="subject">Asunto</label><br>
+          <input class="form-input px-4 py-2 brutalist-border w-full" type="text" id="subject" name="subject" required><br><br>
+
+          <label for="message">Mensaje</label><br>
+          <textarea class="form-input px-4 py-2 brutalist-border w-full" id="message" name="message" required></textarea><br><br>
+
+          <button type="submit" class="form-input p-2 brutalist-border">Enviar Mensaje</button>
+
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_next" value="http://localhost:4321/">  
+        </form>
+
+      <div 
+      data-aos="fade-up" 
+      data-aos-delay="200" 
+      class="text-center flex flex-col items-center justify-center"
+    >
+      <div class="text-xl font-bold mb-4 mt-8">Síguenos</div>
+      <di class="mx-auto px-4 flex space-x-4">
+        <a href="https://www.instagram.com/indumentaria.kaya" target="_blank" rel="noopener noreferrer" 
+           class="brutalist-border p-2">
+          Instagram
+        </a>
+        <a href="https://wa.me/5491138229376" target="_blank" rel="noopener noreferrer" 
+           class="brutalist-border p-2">
+          WhatsApp
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61559965091694" target="_blank" rel="noopener noreferrer" 
+           class="brutalist-border p-2">
+          Facebook
+        </a>
+    </div>
+    <footer class="bg-kaya-dark py-12 mt-10">
+      <div class="container mx-auto px-4">
+        <div class="text-center">
+          <div data-aos="fade-up">
+            <h3 class="text-2xl font-bold mb-4">Kaya</h3>
+            <p class="font-mono">Indumentaria</p>
+            <div class="mt-12 pt-8 border-t border-kaya-light/20 text-center font-mono">
+              <p>&copy; {currentYear} Kaya Indumentaria. Todos los derechos reservados.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+      </div>
+    </div>
+<style>
+  h4{
+    background-color: var(--bg-color);
+    color: var(--text-color)
+  }
+  button{
+    background-color: var(--bg-color);
+    color: var(--text-color)
+  }
+  .brutalist-border {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        border: 2px solid currentColor;
+        transition: all 0.3s ease;
+      }
+
+      .brutalist-border:hover {
+        transform: translate(-4px, -4px);
+        box-shadow: 4px 4px 0 rgb(165, 3, 3);
+      }
+</style>

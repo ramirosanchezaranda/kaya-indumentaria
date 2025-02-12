@@ -1,0 +1,222 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MercadoPagoButton from '../components/MercadoPagoButton';
+import PaymentMethod from '../components/payment/PaymentMethod.astro';
+---
+
+<Layout title="Checkout">
+  <main class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-3xl font-bold mb-6">Finalizar Compra</h1>
+      
+      <div class="bg-kaya-dark/50 p-6 brutalist-border mb-6">
+        <h2 class="text-xl font-mono mb-4">Resumen de la compra</h2>
+        
+        <div id="cart-summary" class="space-y-4">
+          <!-- El contenido del carrito se cargará aquí dinámicamente -->
+        </div>
+
+        <!-- Código promocional -->
+        <div class="mt-4 pt-4">
+          <div class="flex gap-2">
+            <input 
+              type="text" 
+              id="promo-code" 
+              placeholder="Código promocional"
+              class="flex-1 p-2 bg-kaya-dark brutalist-border focus:outline-none font-mono"
+            />
+            <button 
+              id="apply-promo"
+              class="px-4 py-2 bg-kaya-dark brutalist-border hover:text-kaya-accent font-mono"
+            >
+              Aplicar
+            </button>
+          </div>
+          <p id="promo-message" class="mt-2 text-sm font-mono"></p>
+        </div>
+
+        <div class="border-t border-gray-200 mt-4 pt-4 space-y-2">
+          <div class="flex justify-between font-mono">
+            <span>Subtotal:</span>
+            <span id="cart-subtotal">$0</span>
+          </div>
+          <div id="discount-row" class="flex justify-between font-mono hidden">
+            <span>Descuento:</span>
+            <span id="cart-discount">-$0</span>
+          </div>
+          <div class="flex justify-between font-mono text-lg">
+            <span>Total:</span>
+            <span id="cart-total">$0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <PaymentMethod client:visible />
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  // Hacer las funciones accesibles globalmente
+  window.cartState = {
+    items: [],
+    subtotal: 0,
+    discount: 0,
+    total: 0,
+    activePromo: null
+  };
+
+  // Función para actualizar la cantidad de un producto
+  window.updateQuantity = function(productId, newQuantity) {
+    console.log('Actualizando cantidad:', { productId, newQuantity }); // Debug
+    if (newQuantity < 1) return;
+    
+    let cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+    cartItems = cartItems.map(item => {
+      if (item.id === productId) {
+        return { ...item, quantity: newQuantity };
+      }
+      return item;
+    });
+    
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+    window.loadCartItems(); // Recargar el carrito
+    
+    // Actualizar el contador del carrito en el navbar
+    const cartCount = document.getElementById('cart-count');
+    if (cartCount) {
+      const totalItems = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      cartCount.textContent = totalItems.toString();
+    }
+  }
+
+  // Función para cargar y mostrar los productos del carrito
+  window.loadCartItems = function() {
+    console.log('Cargando items del carrito'); // Debug
+    const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cartSummary = document.getElementById('cart-summary');
+    
+    if (!cartItems.length) {
+      cartSummary.innerHTML = '<p class="text-gray-500 font-mono">No hay productos en el carrito</p>';
+      window.updateDisplay();
+      return;
+    }
+
+    window.cartState.subtotal = 0;
+    cartSummary.innerHTML = cartItems.map(item => {
+      const quantity = item.quantity || 1;
+      const itemTotal = parseFloat(item.price) * quantity;
+      window.cartState.subtotal += itemTotal;
+
+      return `
+        <div class="flex items-center justify-between p-4 bg-kaya-dark/30 brutalist-border hover:bg-kaya-dark/40 transition-colors" data-product-id="${item.id}">
+          <div class="flex-1">
+            <h3 class="font-mono text-lg">${item.name}</h3>
+            <div class="flex items-center gap-4 mt-2">
+              <div class="flex items-center gap-2 brutalist-border p-1">
+                <button 
+                  type="button"
+                  onclick="window.updateQuantity(${item.id}, ${quantity - 1})"
+                  class="px-3 py-1 hover:text-kaya-accent font-mono text-lg ${quantity <= 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                  ${quantity <= 1 ? 'disabled' : ''}
+                >
+                  -
+                </button>
+                <span class="font-mono w-8 text-center">${quantity}</span>
+                <button 
+                  type="button"
+                  onclick="window.updateQuantity(${item.id}, ${quantity + 1})"
+                  class="px-3 py-1 hover:text-kaya-accent font-mono text-lg"
+                >
+                  +
+                </button>
+              </div>
+              <p class="text-sm text-gray-400 font-mono">
+                $${item.price} c/u
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-6">
+            <span class="font-mono text-lg">$${itemTotal.toFixed(2)}</span>
+            <button 
+              type="button"
+              onclick="window.removeFromCart(${item.id})"
+              class="brutalist-border px-3 py-1 hover:text-red-500 hover:border-red-500 transition-all font-mono text-lg"
+              title="Eliminar producto"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    window.cartState.total = window.cartState.subtotal - window.cartState.discount;
+    window.updateDisplay();
+  }
+
+  // Función para actualizar la visualización de totales
+  window.updateDisplay = function() {
+    console.log('Actualizando display:', window.cartState); // Debug
+    const subtotalElement = document.getElementById('cart-subtotal');
+    const discountElement = document.getElementById('cart-discount');
+    const totalElement = document.getElementById('cart-total');
+    const discountRow = document.getElementById('discount-row');
+
+    if (subtotalElement) subtotalElement.textContent = `$${window.cartState.subtotal.toFixed(2)}`;
+    if (totalElement) totalElement.textContent = `$${window.cartState.total.toFixed(2)}`;
+    
+    if (window.cartState.discount > 0) {
+      discountRow?.classList.remove('hidden');
+      if (discountElement) discountElement.textContent = `-$${window.cartState.discount.toFixed(2)}`;
+    } else {
+      discountRow?.classList.add('hidden');
+    }
+  }
+
+  // Función para eliminar un producto
+  window.removeFromCart = function(productId) {
+    console.log('Eliminando producto:', productId); // Debug
+    const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+    const updatedCart = cartItems.filter(item => item.id !== productId);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    
+    const itemElement = document.querySelector(`[data-product-id="${productId}"]`);
+    if (itemElement) {
+      itemElement.style.transition = 'all 0.3s ease-out';
+      itemElement.style.opacity = '0';
+      itemElement.style.transform = 'translateX(-20px)';
+      setTimeout(() => {
+        if (updatedCart.length === 0) {
+          window.location.href = '/galeria';
+        } else {
+          window.loadCartItems();
+        }
+      }, 300);
+    }
+
+    // Actualizar el contador del carrito en el navbar
+    const cartCount = document.getElementById('cart-count');
+    if (cartCount) {
+      const totalItems = updatedCart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      cartCount.textContent = totalItems.toString();
+    }
+  }
+
+  // Inicializar la página
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('Página cargada, inicializando carrito'); // Debug
+    window.loadCartItems();
+
+    // Event listeners para el código promocional
+    const applyButton = document.getElementById('apply-promo');
+    const promoInput = document.getElementById('promo-code');
+
+    applyButton?.addEventListener('click', () => {
+      // Aquí iría la lógica del código promocional
+      console.log('Aplicar promoción:', promoInput?.value);
+    });
+  });
+</script>

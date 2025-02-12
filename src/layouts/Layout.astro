@@ -1,0 +1,71 @@
+---
+import '../styles/global.css';
+import Navbar from '../components/navbar/NavBar.astro';
+import Footer from '../components/footer/Footer.astro';
+import 'aos/dist/aos.css';
+import ThemeToggle from '../components/navbar/ThemeToggle.astro';
+import CartButton from '../components/payment/checkout/CartButton.astro';
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Kaya Indumentaria - Vanguardia en estilo" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/images/kaya-ind-favicon.jpg" />
+    <title>Kaya Indumentaria | {title}</title>
+    <script is:inline>
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+    </script>
+  </head>
+  <body>
+    <Navbar />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      import AOS from 'aos';
+
+      // Inicializar AOS
+      AOS.init({
+        duration: 800,
+        once: true,
+        offset: 50
+      });
+
+      // Gestión del tema
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        return 'light';
+      })();
+      
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+
+      window.localStorage.setItem('theme', theme);
+    </script>
+
+
+  </body>
+</html>

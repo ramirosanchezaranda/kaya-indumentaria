@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Error en el Pago">
+  <main class="min-h-screen flex items-center justify-center bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-md max-w-md w-full text-center">
+      <div class="mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-800 mb-4">Error en el Pago</h1>
+      <p class="text-gray-600 mb-6">
+        Lo sentimos, hubo un problema al procesar tu pago. Por favor, intenta nuevamente o contacta con nuestro servicio de atención al cliente.
+      </p>
+      <div class="space-y-3">
+        <a
+          href="/"
+          class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+        >
+          Volver al inicio
+        </a>
+        <button
+          onclick="window.history.back()"
+          class="block w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg transition-colors"
+        >
+          Intentar nuevamente
+        </button>
+      </div>
+    </div>
+  </main>
+</Layout>

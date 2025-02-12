@@ -1,0 +1,67 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import ProductDetail from '../../../components/product/ProductDetail.astro';
+import ProductCarousel from '../../../components/product/ProductCarousel.astro';
+import supabase from '../../../config/db';
+
+// Desactivar pre-renderizado para permitir rutas dinámicas
+export const prerender = false;
+
+// Fetch all products for static paths
+export async function getStaticPaths() {
+  const { data: products, error } = await supabase
+    .from('productos')
+    .select('id');
+
+  if (error) {
+    console.error('Error fetching products:', error);
+    return [];
+  }
+
+  return products.map(product => ({
+    params: { id: product.id.toString() },
+    props: { productId: product.id }
+  }));
+}
+
+const { id } = Astro.params;
+let product = null;
+let error = null;
+
+try {
+  const { data, error: supabaseError } = await supabase
+    .from('productos')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (supabaseError) throw supabaseError;
+
+  if (data) {
+    product = {
+      id: data.id,
+      name: data.nombre,
+      image: data.imagen,
+      price: data.price,
+      // Agregar descripción por defecto
+      description: data.description || `${data.nombre} - Un producto exclusivo de Kaya Indumentaria`,
+      // Tallas estándar
+      sizes: ['S', 'M', 'L', 'XL']
+    };
+  }
+} catch (e) {
+  console.error('Error al cargar el producto:', e);
+  error = e.message;
+}
+
+if (!product) {
+  return Astro.redirect('/404');
+}
+---
+
+<Layout title={product.name}>
+  <div class="pt-24 pb-12">
+    <ProductDetail {...product} />
+    <ProductCarousel />
+  </div>
+</Layout>

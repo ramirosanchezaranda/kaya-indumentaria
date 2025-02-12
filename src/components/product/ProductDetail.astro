@@ -1,0 +1,363 @@
+---
+import ThemeToggle from '../components/ThemeToggle.astro';
+interface Props {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  description?: string;
+  sizes?: readonly string[];
+}
+
+const { id, name, price, image, description, sizes } = Astro.props;
+---
+
+<div class="max-w-6xl mx-auto p-6">
+  <div class="grid md:grid-cols-2 gap-12" data-aos="fade-up">
+    <div class="brutalist-border p-4">
+      <div class="product-gallery">
+        <!-- Contenedor principal de la imagen -->
+        <div class="image-container relative overflow-hidden cursor-zoom-in">
+          <img 
+            id="main-image"
+            src={image} 
+            alt={name}
+            class="w-full h-full object-cover transition-transform duration-300"
+          />
+          
+          <!-- Indicador de zoom -->
+          <div class="zoom-indicator absolute bottom-4 right-4 brutalist-border bg-white/90 px-3 py-1 text-sm">
+            Click para ampliar
+          </div>
+        </div>
+
+        <!-- Modal de zoom -->
+        <div id="zoom-modal" class="fixed inset-0 bg-black/95 z-50 hidden">
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="relative w-full h-full">
+              <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
+                <img 
+                  id="zoomed-image"
+                  src={image}
+                  alt={name}
+                  class="max-w-none cursor-move transition-transform duration-200"
+                />
+              </div>
+              
+              <!-- Controles simples -->
+              <button 
+                id="close-zoom"
+                class="absolute top-4 right-4 brutalist-border bg-white/10 p-2 hover:bg-white/20"
+                aria-label="Cerrar"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="space-y-6">
+      <h1 class="text-4xl font-bold">{name}</h1>
+      <p class="text-2xl font-mono text-kaya-accent">${price}</p>
+      {description && <p class="font-mono">{description}</p>}
+      
+      {sizes && sizes.length > 0 && (
+        <div class="space-y-4">
+          <h3 class="text-xl font-bold">Tallas</h3>
+          <div class="flex gap-4">
+            {sizes.map(size => (
+              <button 
+                class="brutalist-border px-4 py-2 hover:text-kaya-accent size-button"
+                data-size={size}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+          <p id="selected-size-display" class="text-kaya-accent font-mono hidden">
+            Talla seleccionada: <span class="font-bold"></span>
+          </p>
+
+          <div class="mt-4 pt-4 border-t border-gray-200">
+            <h3 class="text-xl font-bold mb-4">Calcular Costo de Envío</h3>
+            <div class="flex gap-4">
+              <input 
+                type="text" 
+                id="shipping-postal-code"
+                placeholder="Ingresa tu código postal"
+                class="flex-grow px-4 py-2 brutalist-border focus:outline-none focus:border-kaya-accent"
+                maxlength="4"
+              />
+              <button 
+                id="calculate-shipping"
+                class="brutalist-border px-6 py-2 hover:text-kaya-accent"
+              >
+                Calcular
+              </button>
+            </div>
+            <div id="shipping-result" class="hidden mt-4">
+              <p class="font-mono">
+                Costo de envío: <span class="font-bold text-kaya-accent" id="shipping-cost"></span>
+              </p>
+              <p class="text-sm text-gray-600">Tiempo estimado de entrega: 3-5 días hábiles</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <button 
+        id="add-to-cart"
+        class="brutalist-border w-full py-3 mt-8 hover:text-kaya-accent transition-colors text-center text-lg"
+      >
+        COMPRAR AHORA
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .image-container:hover .zoom-indicator {
+    opacity: 0;
+  }
+
+  .zoom-indicator {
+    transition: opacity 0.2s;
+  }
+
+  #zoomed-image {
+    max-height: 90vh;
+    max-width: 90vw;
+  }
+
+  /* Ocultar scrollbars pero mantener funcionalidad */
+  #zoom-modal {
+    animation: fadeIn 0.2s ease-out;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  #zoom-modal::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  /* Aplicar a todos los contenedores con scroll */
+  .overflow-auto, .overflow-hidden {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .overflow-auto::-webkit-scrollbar, 
+  .overflow-hidden::-webkit-scrollbar {
+    display: none;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+</style>
+
+<script>
+  const imageContainer = document.querySelector('.image-container');
+  const mainImage = document.getElementById('main-image');
+  const zoomModal = document.getElementById('zoom-modal');
+  const zoomedImage = document.getElementById('zoomed-image');
+  const closeZoom = document.getElementById('close-zoom');
+
+  if (imageContainer && mainImage && zoomModal && zoomedImage && closeZoom) {
+    let isPanning = false;
+    let startPoint = { x: 0, y: 0 };
+    let currentTranslate = { x: 0, y: 0 };
+
+    // Abrir zoom
+    imageContainer.addEventListener('click', () => {
+      zoomModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      zoomedImage.style.transform = 'scale(1.5)'; // Zoom inicial
+    });
+
+    // Cerrar zoom
+    closeZoom.addEventListener('click', () => {
+      zoomModal.classList.add('hidden');
+      document.body.style.overflow = '';
+      // Resetear posición
+      currentTranslate = { x: 0, y: 0 };
+      zoomedImage.style.transform = 'translate(0, 0) scale(1)';
+    });
+
+    // Cerrar con ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !zoomModal.classList.contains('hidden')) {
+        closeZoom.click();
+      }
+    });
+
+    // Mover imagen
+    zoomedImage.addEventListener('mousedown', (e) => {
+      isPanning = true;
+      startPoint = {
+        x: e.clientX - currentTranslate.x,
+        y: e.clientY - currentTranslate.y
+      };
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isPanning) return;
+
+      e.preventDefault();
+      currentTranslate = {
+        x: e.clientX - startPoint.x,
+        y: e.clientY - startPoint.y
+      };
+
+      zoomedImage.style.transform = `translate(${currentTranslate.x}px, ${currentTranslate.y}px) scale(1.5)`;
+    });
+
+    document.addEventListener('mouseup', () => {
+      isPanning = false;
+    });
+
+    // Soporte táctil
+    let initialDistance = 0;
+    let initialScale = 1.5;
+
+    zoomModal.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        initialDistance = Math.hypot(
+          e.touches[0].pageX - e.touches[1].pageX,
+          e.touches[0].pageY - e.touches[1].pageY
+        );
+      }
+    });
+
+    zoomModal.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2) {
+        const currentDistance = Math.hypot(
+          e.touches[0].pageX - e.touches[1].pageX,
+          e.touches[0].pageY - e.touches[1].pageY
+        );
+        
+        const scale = (currentDistance / initialDistance) * initialScale;
+        const limitedScale = Math.min(Math.max(scale, 1), 3);
+        
+        zoomedImage.style.transform = `scale(${limitedScale})`;
+      }
+    });
+  }
+
+  // Manejar selección de talla
+  document.querySelectorAll('.size-button').forEach(button => {
+    button.addEventListener('click', (e) => {
+      // Remover selección previa
+      document.querySelectorAll('.size-button').forEach(btn => 
+        btn.classList.remove('bg-kaya-accent', 'text-white'));
+      
+      // Agregar selección nueva
+      button.classList.add('bg-kaya-accent', 'text-white');
+      selectedSize = button.dataset.size;
+
+      // Mostrar talla seleccionada
+      const sizeDisplay = document.getElementById('selected-size-display');
+      if (sizeDisplay) {
+        sizeDisplay.querySelector('span').textContent = selectedSize;
+        sizeDisplay.classList.remove('hidden');
+      }
+    });
+  });
+
+  // Función para calcular el costo de envío
+  function calculateShipping(postalCode) {
+    const costs = {
+      '1000': 2500, // CABA
+      '1400': 2500,
+      '1600': 3000, // GBA Norte
+      '1700': 3000,
+      '1800': 3000, // GBA Sur
+      '1900': 3000,
+      default: 4500  // Resto del país
+    };
+
+    const firstDigits = postalCode.substring(0, 2) + '00';
+    return costs[firstDigits] || costs.default;
+  }
+
+  // Manejar cálculo de envío
+  document.getElementById('calculate-shipping')?.addEventListener('click', () => {
+    const postalCodeInput = document.getElementById('shipping-postal-code');
+    const postalCode = postalCodeInput.value.trim();
+    
+    if (postalCode.length !== 4 || !/^\d+$/.test(postalCode)) {
+      alert('Por favor ingresa un código postal válido de 4 dígitos');
+      return;
+    }
+
+    const shippingCost = calculateShipping(postalCode);
+    const resultDiv = document.getElementById('shipping-result');
+    const costSpan = document.getElementById('shipping-cost');
+    
+    costSpan.textContent = new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS'
+    }).format(shippingCost);
+    
+    resultDiv.classList.remove('hidden');
+  });
+
+  // Validar solo números en el input de código postal
+  document.getElementById('shipping-postal-code')?.addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/[^\d]/g, '');
+  });
+
+  // Manejar click en botón de compra
+  document.getElementById('add-to-cart').addEventListener('click', () => {
+    // Verificar si hay tallas disponibles y si se seleccionó una
+    const hasSizes = document.querySelector('.size-button');
+    if (hasSizes && !selectedSize) {
+      alert('Por favor selecciona una talla');
+      return;
+    }
+
+    // Crear objeto del producto
+    const product = {
+      id,
+      name,
+      price,
+      image,
+      size: selectedSize,
+      quantity: 1
+    };
+
+    // Obtener carrito actual
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    
+    // Buscar si el producto ya existe en el carrito
+    const existingItemIndex = cart.findIndex(item => 
+      item.id === product.id && item.size === product.size
+    );
+
+    if (existingItemIndex !== -1) {
+      // Si existe, incrementar cantidad
+      cart[existingItemIndex].quantity += 1;
+    } else {
+      // Si no existe, agregar al carrito
+      cart.push(product);
+    }
+
+    // Guardar carrito actualizado
+    localStorage.setItem('cart', JSON.stringify(cart));
+
+    // Actualizar contador del carrito si existe
+    const cartCount = document.getElementById('cart-count');
+    if (cartCount) {
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      cartCount.textContent = totalItems.toString();
+    }
+
+    // Redirigir al checkout
+    window.location.href = '/checkout';
+  });
+</script>

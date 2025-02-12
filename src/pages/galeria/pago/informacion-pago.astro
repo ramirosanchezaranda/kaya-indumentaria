@@ -1,0 +1,73 @@
+---
+import React from 'react';
+import Layout from '../../layouts/Layout.astro';
+import PaymentInfo from '../../components/payment/PaymentInfo.jsx';
+---
+
+<Layout title="Información de Pago">
+  <div class="pt-24 pb-12">
+    <div class="container mx-auto px-4 max-w-md mx-auto p-6 brutalist-border bg-kaya-dark/50 aos-init aos-animate">
+      <h1 class="text-4xl font-bold mb-8" data-aos="fade-right">INFORMACIÓN DE PAGO</h1>
+      <div className="bg-white p-6 rounded-lg">
+      <h2 className="text-2xl font-bold mb-6">Información de Pago por Transferencia</h2>
+      <br>
+      
+      <div className="space-y-6">
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2">Datos Bancarios</h3>
+          <br>
+          <div className="space-y-2">
+            <p><span className="font-semibold">Banco:</span> Banco de la Nación Argentina</p>
+            <p><span className="font-semibold">Tipo de Cuenta:</span> Caja de Ahorro</p>
+            <p><span className="font-semibold">Titular:</span> [Nombre del Titular]</p>
+            <p><span className="font-semibold">CUIL/CUIT:</span> XX-XXXXXXXX-X</p>
+            <p><span className="font-semibold">CBU:</span> XXXXXXXXXXXXXXXXXXXXXXX</p>
+            <p><span className="font-semibold">Alias:</span> KAYA.INDUMENTARIA</p>
+            <br>
+          </div>
+        </div>
+
+        <div className="bg-yellow-50 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2">Instrucciones</h3>
+          <ol className="list-decimal list-inside space-y-2">
+            <li>Realiza la transferencia por el monto total de tu compra</li>
+            <li>Envía el comprobante de pago a nuestro WhatsApp o correo electrónico</li>
+            <li>Incluye en el mensaje:
+              <ul className="list-disc list-inside ml-4 mt-1">
+                <li>Número de orden</li>
+                <li>Nombre completo</li>
+                <li>Dirección de envío</li>
+              </ul>
+            </li>
+            <br>
+            <li>Una vez verificado el pago, procesaremos tu pedido</li>
+            <br>
+          </ol>
+        </div>
+
+        <div className="bg-green-50 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2">Contacto</h3>
+          <div className="space-y-2"> 
+            <p><a href="https://api.whatsapp.com/send/?phone=5491138229376&text&type=phone_number&app_absent=0">Kaya Indumentaria WhatsApp <span icon="whatsapp"> 📱 </span> </a></p>
+            <br>  
+            <p><span className="font-semibold"><a href="mailto:contacto@kaya.com.ar">contacto@kaya.com.ar</a></span></p>
+            <br>
+            <p className="text-sm text-gray-600 mt-2">Horario de atención: Lunes a Viernes de 9:00 a 18:00 hs</p>
+            <br>
+          </div>
+        </div>
+
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2">Importante</h3>
+          <ul className="list-disc list-inside space-y-2 text-sm">
+            <li>El envío se realizará una vez confirmado el pago</li>
+            <li>Conserva el comprobante de transferencia hasta recibir tu pedido</li>
+            <li>Los precios pueden variar sin previo aviso</li>
+            <li>Para cualquier consulta, no dudes en contactarnos</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</Layout>

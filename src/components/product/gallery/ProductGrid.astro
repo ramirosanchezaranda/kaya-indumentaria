@@ -1,0 +1,63 @@
+---
+import ProductCard from '../ProductCard.astro';
+import supabase from '../../../config/db';
+
+let products = [];
+let error = null;
+let tableInfo = null;
+
+try {
+  // Primero, obtener la información de la tabla
+  const { data: tableData, error: tableError } = await supabase
+    .from('productos')
+    .select()
+    .limit(1);
+
+  if (tableData && tableData.length > 0) {
+    tableInfo = Object.keys(tableData[0]).join(', ');
+    console.log('Columnas en la tabla productos:', tableInfo);
+  }
+
+  // Luego, obtener los productos
+  const { data, error: supabaseError } = await supabase
+    .from('productos')
+    .select();
+
+  if (supabaseError) throw supabaseError;
+  
+  // Mapear los nombres de las columnas para que coincidan con el ProductCard
+  products = data?.map(product => ({
+    id: product.id,
+    name: product.nombre,
+    image: product.imagen,
+    price: product.price
+  })) || [];
+} catch (e) {
+  console.error('Error al cargar productos:', e);
+  error = e.message;
+}
+---
+
+{error && (
+  <div class="text-center p-8">
+    <div class="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg">
+      <p class="font-bold text-lg mb-2">Error al cargar productos</p>
+      <p>{error}</p>
+      {tableInfo && (
+        <p class="mt-2">
+          <strong>Columnas disponibles en la tabla:</strong> {tableInfo}
+        </p>
+      )}
+    </div>
+  </div>
+)}
+
+{!error && (
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    {products.map(product => (
+      <div data-aos="fade-up">
+        <ProductCard {...product} />
+      </div>
+    ))}
+  </div>
+)}

@@ -1,0 +1,57 @@
+---
+// ThemeToggle.astro
+---
+
+<script>
+  const theme = (() => {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+      return localStorage.getItem('theme');
+    }
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
+  })();
+
+  document.documentElement.setAttribute('data-theme', theme);
+
+  const handleToggleClick = () => {
+    const root = document.documentElement;
+    const currentTheme = root.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    root.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggleButton = document.getElementById('theme-toggle');
+    toggleButton?.addEventListener('click', handleToggleClick);
+  });
+</script>
+
+<button
+  type="button"
+  id="theme-toggle"
+  class="theme-toggle opacity-50 hover:opacity-100 transition-opacity duration-300 ease-in-out"
+  aria-label="Cambiar tema"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="current-color">
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+  </svg>
+</button>
+
+<style>
+  .theme-toggle {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+</style>

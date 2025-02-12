@@ -1,0 +1,124 @@
+---
+// src/components/forms/RegisterForm.astro
+---
+
+<div class="brutalist-border p-4 w-full max-w-md mx-auto">
+  <form id="register-form" class="space-y-4">
+    <div>
+      <label for="name" class="block text-sm font-medium mb-1">Nombre completo</label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        required
+        class="w-full brutalist-border px-4 py-2 focus:outline-none focus:border-kaya-accent"
+      />
+    </div>
+
+    <div>
+      <label for="email" class="block text-sm font-medium mb-1">Email</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        required
+        class="w-full brutalist-border px-4 py-2 focus:outline-none focus:border-kaya-accent"
+      />
+    </div>
+
+    <div>
+      <label for="password" class="block text-sm font-medium mb-1">Contraseña</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        required
+        minlength="6"
+        class="w-full brutalist-border px-4 py-2 focus:outline-none focus:border-kaya-accent"
+      />
+    </div>
+
+    <button
+      type="submit"
+      id="register-button"
+      class="w-full brutalist-border py-2 px-4 hover:text-kaya-accent"
+    >
+      REGISTRARSE
+    </button>
+  </form>
+
+  <!-- Mensaje de éxito (oculto por defecto) -->
+  <div id="success-message" class="hidden mt-4">
+    <div class="bg-green-50 brutalist-border p-4">
+      <h3 class="text-lg font-bold text-green-800">¡Registro exitoso!</h3>
+      <p class="text-green-700">
+        Te hemos enviado un correo de confirmación. Por favor revisa tu bandeja de entrada.
+      </p>
+    </div>
+  </div>
+
+  <!-- Mensaje de error (oculto por defecto) -->
+  <div id="error-message" class="hidden mt-4">
+    <div class="bg-red-50 brutalist-border p-4">
+      <h3 class="text-lg font-bold text-red-800">Error en el registro</h3>
+      <p class="text-red-700" id="error-text"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('register-form');
+  const successMessage = document.getElementById('success-message');
+  const errorMessage = document.getElementById('error-message');
+  const errorText = document.getElementById('error-text');
+  const registerButton = document.getElementById('register-button');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Deshabilitar botón y mostrar estado de carga
+    registerButton.disabled = true;
+    registerButton.textContent = 'REGISTRANDO...';
+
+    // Ocultar mensajes previos
+    successMessage.classList.add('hidden');
+    errorMessage.classList.add('hidden');
+
+    try {
+      const formData = new FormData(form);
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.get('name'),
+          email: formData.get('email'),
+          password: formData.get('password')
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Mostrar mensaje de éxito
+        form.reset();
+        successMessage.classList.remove('hidden');
+        
+        // Scroll al mensaje de éxito
+        successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        throw new Error(data.message || 'Error en el registro');
+      }
+    } catch (error) {
+      // Mostrar mensaje de error
+      errorText.textContent = error.message;
+      errorMessage.classList.remove('hidden');
+      errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } finally {
+      // Restaurar botón
+      registerButton.disabled = false;
+      registerButton.textContent = 'REGISTRARSE';
+    }
+  });
+</script>

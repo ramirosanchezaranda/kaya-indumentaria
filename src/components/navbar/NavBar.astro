@@ -1,0 +1,151 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import CartButton from '../payment/checkout/CartButton.astro';
+
+const navItems = [
+  { name: 'Inicio', path: '/' },
+  { name: 'Galería', path: '/galeria' },
+  { name: 'Nosotros', path: 'https://linktree-kayaind.vercel.app', external: true },
+  { name: 'Registrarse', path: '/registro' },
+];
+
+const socialLinks = [
+  { name: 'Instagram', url: 'https://www.instagram.com/indumentaria.kaya', icon: 'instagram.svg' },
+  { name: 'WhatsApp', url: 'https://wa.me/5491138229376', icon: 'whatsapp.svg' },
+];
+---
+
+<nav class="fixed w-full top-0 z-50 backdrop-blur-md">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-20">
+      <!-- Logo -->
+      <div class="flex-shrink-0">
+        <a href="/" class="text-2xl font-neue font-bold container mx-auto brutalist-border">kaya.indumentaria</a>
+      </div>
+
+      <!-- Mobile menu button -->
+      <button id="menu-toggle" class="md:hidden brutalist-border p-2 backdrop-blur-sm">
+        <span class="sr-only">Menu</span>
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <!-- Desktop menu -->
+      <div class="hidden md:flex items-center space-x-8">
+        {navItems.map(item => (
+          <a href={item.path} class="brutalist-border px-4 py-2 hover:text-kaya-accent">
+            {item.name}
+          </a>
+        ))}
+              <!-- Theme Toggle and Cart -->
+      <div class="flex items-center gap-4">
+        <CartButton />
+        <ThemeToggle />
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="hidden md:hidden backdrop-blur-md">
+    <style>
+      #mobile-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: scaleY(0);
+        transform-origin: top;
+        transition: all 0.3s ease-in-out;
+        background: rgba(var(--bg-color-rgb), 0.8);
+        backdrop-filter: blur(15px);
+        padding: 1rem;
+      }
+
+      #mobile-menu.show {
+        max-height: 100vh;
+        opacity: 1;
+        transform: scaleY(1);
+      }
+
+      #mobile-menu .menu-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: stretch;
+      }
+
+      #mobile-menu .menu-item {
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.3s ease-in-out;
+        text-align: center;
+        padding: 1rem;
+        margin: 0;
+      }
+
+      #mobile-menu.show .menu-item {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      #mobile-menu .menu-item:nth-child(1) { transition-delay: 0.1s; }
+      #mobile-menu .menu-item:nth-child(2) { transition-delay: 0.2s; }
+      #mobile-menu .menu-item:nth-child(3) { transition-delay: 0.3s; }
+      #mobile-menu .menu-item:nth-child(4) { transition-delay: 0.4s; }
+      #mobile-menu .menu-item:nth-child(5) { transition-delay: 0.5s; }
+      #mobile-menu .menu-item:nth-child(6) { transition-delay: 0.6s; }
+    </style>
+    <div class="menu-container">
+      {navItems.map((item, index) => (
+        <a href={item.path} class="menu-item brutalist-border">
+          {item.name}
+        </a>
+      ))}
+      {socialLinks.map((link, index) => (
+        <a href={link.url} target="_blank" rel="noopener noreferrer" 
+           class="menu-item brutalist-border">
+          {link.name}
+        </a>
+      ))}
+    </div>
+  </div>
+</nav>
+
+<script>
+  const menuToggle = document.getElementById('menu-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  menuToggle?.addEventListener('click', (event) => {
+    event.stopPropagation(); // Prevent event from bubbling
+    if (mobileMenu?.classList.contains('show')) {
+      // Close animation
+      mobileMenu.classList.remove('show');
+      setTimeout(() => {
+        mobileMenu.classList.add('hidden');
+      }, 300);
+    } else {
+      // Open animation
+      mobileMenu?.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        mobileMenu?.classList.add('show');
+      });
+    }
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (event) => {
+    if (mobileMenu?.classList.contains('show') && 
+        !menuToggle?.contains(event.target as HTMLElement) && 
+        !mobileMenu?.contains(event.target as HTMLElement)) {
+      mobileMenu.classList.remove('show');
+      setTimeout(() => {
+        mobileMenu.classList.add('hidden');
+      }, 300);
+    }
+  });
+</script>
