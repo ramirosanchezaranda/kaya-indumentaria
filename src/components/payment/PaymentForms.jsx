@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { PaymentInputsWrapper, usePaymentInputs } from 'react-payment-inputs'
-import images from 'react-payment-inputs/images'
 
 const PaymentForms = () => {
     const [state, setState] = useState({
@@ -13,7 +12,6 @@ const PaymentForms = () => {
 
     const { 
         wrapperProps, 
-        getCardImageProps, 
         getCardNumberProps, 
         getExpiryDateProps, 
         getCVCProps 
